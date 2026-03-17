@@ -1,0 +1,10 @@
+.glitch {
+  animation: glitch 2s infinite;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 0.05em 0 0 #f00, -0.05em 0 0 #0f0, 0 0.05em 0 #00f; }
+  14% { text-shadow: 0.05em 0 0 #f00, -0.05em 0 0 #0f0, 0 0.05em 0 #00f; }
+  15% { text-shadow: -0.05em -0.025em 0 #f00, 0.025em 0.025em 0 #0f0, 0 -0.05em 0 #00f; }
+  /* tambahin lebih glitch kalau mau */
+}
