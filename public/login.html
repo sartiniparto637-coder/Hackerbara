@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Login</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="center">
@@ -8,22 +9,19 @@
 <div class="card">
 <h2>Login Voice AI</h2>
 
-<input id="user" placeholder="username">
-<input id="pass" type="password" placeholder="password">
+<input id="u" placeholder="username">
+<input id="p" type="password" placeholder="password">
 
-<button onclick="login()">LOGIN</button>
+<button onclick="go()">LOGIN</button>
 </div>
 
 <script>
-function login(){
-  let u = user.value
-  let p = pass.value
-
-  if(u=="bara" && p=="123"){
-    location="chat.html"
-  }else{
-    alert("login salah")
-  }
+function go(){
+ if(u.value=="bara" && p.value=="123"){
+   location="chat.html"
+ }else{
+   alert("salah")
+ }
 }
 </script>
 
