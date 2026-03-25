@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="top">🎤 Voice AI Chat</div>
+
+<div id="chat"></div>
+
+<button class="mic" onclick="start()">🎙</button>
+
+<script>
+
+let ws
+
+function bubble(text,me){
+  chat.innerHTML += `
+  <div class="${me?'me':'ai'}">${text}</div>
+  `
+  chat.scrollTop = chat.scrollHeight
+}
+
+function start(){
+
+ws = new WebSocket(
+ "wss://api.deepgram.com/v1/listen",
+ ["token","ISI_API_DEEPGRAM_KAMU"]
+)
+
+navigator.mediaDevices.getUserMedia({audio:true})
+.then(stream=>{
+
+const rec = new MediaRecorder(stream)
+
+rec.ondataavailable=e=>{
+ws.send(e.data)
+}
+
+rec.start(250)
+})
+
+ws.onmessage = async msg=>{
+let data = JSON.parse(msg.data)
+
+let text = data.channel?.alternatives?.[0]?.transcript
+
+if(text){
+bubble(text,true)
+
+let ai = await fetch("/ai",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body: JSON.stringify({text})
+})
+
+let res = await ai.json()
+
+bubble(res.text,false)
+
+let audio = new Audio(
+"data:audio/mp3;base64,"+res.audio
+)
+audio.play()
+}
+}
+
+}
+
+</script>
+
+</body>
+</html>
