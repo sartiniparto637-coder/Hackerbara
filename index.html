@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Low.yet AI</title>
+
+<style>
+body{
+background:#0f172a;
+color:white;
+font-family:sans-serif;
+display:flex;
+align-items:center;
+justify-content:center;
+height:100vh;
+margin:0;
+}
+
+.box{
+background:#111827;
+padding:25px;
+border-radius:20px;
+width:90%;
+max-width:400px;
+text-align:center;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:15px;
+border:none;
+background:#22c55e;
+border-radius:12px;
+font-weight:bold;
+}
+
+img{
+width:100%;
+margin-top:15px;
+border-radius:12px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="box">
+
+<h2>@Low.yet</h2>
+<small>Made By Bara</small>
+
+<input type="file" id="f">
+<img id="p">
+
+<button onclick="go()">HD-IN GAMBAR</button>
+
+</div>
+
+<script>
+
+let f = document.getElementById("f")
+let p = document.getElementById("p")
+
+f.onchange=e=>{
+p.src = URL.createObjectURL(e.target.files[0])
+}
+
+async function go(){
+
+let file = f.files[0]
+if(!file) return alert("upload dulu")
+
+let fd = new FormData()
+fd.append("image", file)
+
+let r = await fetch("/upscale",{method:"POST", body:fd})
+
+let blob = await r.blob()
+let url = URL.createObjectURL(blob)
+
+window.open(url)
+
+}
+
+</script>
+
+</body>
+</html>
