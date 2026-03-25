@@ -1,73 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Voice AI</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="top">🎤 Voice AI Chat</div>
+<div class="top">🎤 Voice AI</div>
 
 <div id="chat"></div>
 
-<button class="mic" onclick="start()">🎙</button>
+<button class="mic" onclick="talk()">🎙</button>
 
 <script>
-
-let ws
-
-function bubble(text,me){
-  chat.innerHTML += `
-  <div class="${me?'me':'ai'}">${text}</div>
-  `
-  chat.scrollTop = chat.scrollHeight
+function bubble(t,me){
+ chat.innerHTML += `<div class="${me?'me':'ai'}">${t}</div>`
+ chat.scrollTop = chat.scrollHeight
 }
 
-function start(){
+function talk(){
 
-ws = new WebSocket(
- "wss://api.deepgram.com/v1/listen",
- ["token","ISI_API_DEEPGRAM_KAMU"]
-)
+ let rec
+ navigator.mediaDevices.getUserMedia({audio:true})
+ .then(stream=>{
 
-navigator.mediaDevices.getUserMedia({audio:true})
-.then(stream=>{
+ rec = new MediaRecorder(stream)
 
-const rec = new MediaRecorder(stream)
+ rec.ondataavailable = async e=>{
 
-rec.ondataavailable=e=>{
-ws.send(e.data)
-}
+ let text = "halo" // dummy contoh
 
-rec.start(250)
-})
+ bubble(text,true)
 
-ws.onmessage = async msg=>{
-let data = JSON.parse(msg.data)
+ let ai = await fetch("/ai",{
+ method:"POST",
+ headers:{"Content-Type":"application/json"},
+ body: JSON.stringify({text})
+ })
 
-let text = data.channel?.alternatives?.[0]?.transcript
+ let r = await ai.json()
 
-if(text){
-bubble(text,true)
+ bubble(r.text,false)
 
-let ai = await fetch("/ai",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body: JSON.stringify({text})
-})
+ new Audio(
+  "data:audio/mp3;base64,"+r.audio
+ ).play()
 
-let res = await ai.json()
+ }
 
-bubble(res.text,false)
+ rec.start()
+ setTimeout(()=>rec.stop(),2000)
 
-let audio = new Audio(
-"data:audio/mp3;base64,"+res.audio
-)
-audio.play()
-}
-}
+ })
 
 }
-
 </script>
 
 </body>
