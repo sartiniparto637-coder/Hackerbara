@@ -1,36 +1,36 @@
 const express = require("express")
 const multer = require("multer")
 const sharp = require("sharp")
-const fs = require("fs")
+const path = require("path")
 
 const app = express()
-const upload = multer({ dest:"upload/" })
+const upload = multer({ dest: "upload/" })
 
-app.get("/", (req,res)=>{
-res.sendFile(__dirname + "/index.html")
+// ✅ penting: serve index.html
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"))
 })
 
-app.post("/upscale", upload.single("image"), async (req,res)=>{
+// upscale route
+app.post("/upscale", upload.single("image"), async (req, res) => {
 
-try{
+  try {
 
-let input = req.file.path
-let output = "hd-"+Date.now()+".jpg"
+    let output = "hd-" + Date.now() + ".jpg"
 
-await sharp(input)
-.resize({ width: 3840 }) // target 4K width
-.sharpen()
-.normalize()
-.toFile(output)
+    await sharp(req.file.path)
+      .resize({ width: 3840 })
+      .sharpen()
+      .normalize()
+      .toFile(output)
 
-res.download(output)
+    res.download(output)
 
-}catch(e){
-
-res.send("error")
-
-}
+  } catch (e) {
+    res.send("error upscale")
+  }
 
 })
 
-app.listen(3000,()=>console.log("HD LOCAL READY"))
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => console.log("SERVER RUNNING on port " + PORT))
