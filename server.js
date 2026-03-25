@@ -6,6 +6,10 @@ app.use(express.json())
 
 const DG = process.env.DEEPGRAM
 
+if(!DG){
+  console.log("WARNING: DEEPGRAM API KEY BELUM DISET")
+}
+
 // UI utama (mobile friendly)
 app.get("/", (req,res)=>{
 res.send(`
@@ -25,14 +29,12 @@ display:flex;
 flex-direction:column;
 height:100vh;
 }
-
 .top{
 padding:15px;
 background:#020617;
 text-align:center;
 font-size:20px;
 }
-
 #chat{
 flex:1;
 overflow:auto;
@@ -41,7 +43,6 @@ display:flex;
 flex-direction:column;
 gap:10px;
 }
-
 .me{
 align-self:flex-end;
 background:#22c55e;
@@ -49,7 +50,6 @@ padding:10px;
 border-radius:15px;
 max-width:75%;
 }
-
 .ai{
 align-self:flex-start;
 background:#334155;
@@ -57,7 +57,6 @@ padding:10px;
 border-radius:15px;
 max-width:75%;
 }
-
 .mic{
 position:fixed;
 bottom:20px;
@@ -92,7 +91,6 @@ let rec = new MediaRecorder(stream)
 
 rec.ondataavailable = async e=>{
 
-// DEMO TEXT (nanti bisa realtime STT)
 let text = "halo"
 
 bubble(text,true)
@@ -122,9 +120,9 @@ setTimeout(()=>rec.stop(),2000)
 
 // AI endpoint
 app.post("/ai", async (req,res)=>{
+try{
 
 const text = req.body.text || "halo"
-
 const reply = "Halo juga 👋 Kamu bilang: " + text
 
 const tts = await fetch(
@@ -144,6 +142,28 @@ res.json({
 text: reply,
 audio: Buffer.from(audio).toString("base64")
 })
+
+}catch(e){
+console.log(e)
+res.json({text:"AI error",audio:""})
+}
 })
 
-app.listen(process.env.PORT || 5000)
+// route test biar server ga dimatiin replit
+app.get("/test",(req,res)=>{
+res.send("SERVER HIDUP 🔥")
+})
+
+const PORT = process.env.PORT || 3000
+
+process.on("uncaughtException",err=>{
+console.log("ERROR:",err)
+})
+
+process.on("unhandledRejection",err=>{
+console.log("PROMISE:",err)
+})
+
+app.listen(PORT,"0.0.0.0",()=>{
+console.log("SERVER RUNNING on",PORT)
+})
