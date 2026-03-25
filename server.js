@@ -5,7 +5,7 @@ const app = express()
 app.use(express.json())
 app.use(express.static("public"))
 
-const DEEPGRAM = "ISI_API_DEEPGRAM_KAMU"
+const DEEPGRAM = "1a8bc784c3dab2ba86df7dfd828af42592fb1ad2"
 
 app.post("/ai", async (req,res)=>{
   const text = req.body.text
